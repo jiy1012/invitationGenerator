@@ -24,6 +24,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -73,8 +74,8 @@ func initConfig() {
 		// Find home directory.
 		home, err := os.UserHomeDir()
 		cobra.CheckErr(err)
-		configHome := fmt.Sprintf("%s%d%s", home, os.PathSeparator, ".ig/")
-		os.Mkdir(configHome, 0777)
+		configHome := path.Join(home, baseFolder)
+		os.MkdirAll(configHome, os.ModePerm)
 		// Search config in home directory with name ".invitationGenerator" (without extension).
 		viper.AddConfigPath(configHome)
 		viper.SetConfigType("yaml")

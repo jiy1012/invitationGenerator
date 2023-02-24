@@ -26,6 +26,7 @@ import (
 	"github.com/jiy1012/invitationGenerator/tpl"
 	"html/template"
 	"os"
+	"path"
 
 	"github.com/spf13/cobra"
 )
@@ -33,6 +34,7 @@ import (
 var templateType, outputPath string
 
 const configFileName = "config.yaml"
+const baseFolder = ".ig"
 
 // generalCmd represents the general command
 var generalCmd = &cobra.Command{
@@ -40,7 +42,7 @@ var generalCmd = &cobra.Command{
 	Short: "生成文件模板",
 	Long:  `生成配置文件、处理文件等模板`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("templateType:", templateType, "outputPath:", outputPath)
+		//fmt.Println("templateType:", templateType, "outputPath:", outputPath)
 		switch templateType {
 		case "config":
 			cobra.CheckErr(createConfig())
@@ -63,11 +65,21 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	generalCmd.Flags().StringVarP(&templateType, "template", "t", "config", "config template")
-	generalCmd.Flags().StringVarP(&outputPath, "output", "o", "~/.ig/", "output path")
+	generalCmd.Flags().StringVarP(&outputPath, "output", "o", "", "output path")
 }
 
 func createConfig() error {
-	configFile, err := os.Create(fmt.Sprintf("%s/%s", outputPath, configFileName))
+	if outputPath == "" {
+		home, err := os.UserHomeDir()
+		cobra.CheckErr(err)
+		outputPath = path.Join(home, baseFolder)
+	}
+	err := os.MkdirAll(outputPath, os.ModePerm)
+	fmt.Sprintln(outputPath, err)
+	if err != nil {
+		return err
+	}
+	configFile, err := os.Create(path.Join(outputPath, configFileName))
 	if err != nil {
 		return err
 	}
