@@ -1,0 +1,18 @@
+#basic config
+# input
+# names.txt contains one name in a line
+Names: "config/names.txt"
+ImageTemplate: 'config/templates/background.jpg'
+# output
+OutDir: './output/'
+
+# display 
+Font: "config/fonts/SourceHanSansSC-Bold.otf"
+FontSize: 2
+TextAxisX: 100
+TextAxisY: 200
+TextColor:
+  R: 255
+  G: 222
+  B: 184
+  A: 0

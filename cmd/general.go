@@ -24,7 +24,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/jiy1012/invitationGenerator/tpl"
-	"html/template"
+	"io"
 	"os"
 	"path"
 
@@ -32,9 +32,6 @@ import (
 )
 
 var templateType, outputPath string
-
-const configFileName = "config.yaml"
-const baseFolder = ".ig"
 
 // generalCmd represents the general command
 var generalCmd = &cobra.Command{
@@ -44,9 +41,20 @@ var generalCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		//fmt.Println("templateType:", templateType, "outputPath:", outputPath)
 		switch templateType {
+		case "all":
+			cobra.CheckErr(createConfig())
+			cobra.CheckErr(createFont())
+			cobra.CheckErr(createBG())
+			fmt.Printf("all config、font、background-image template file created at %s\n", outputPath)
 		case "config":
 			cobra.CheckErr(createConfig())
-			fmt.Printf("%s created at %s\n", configFileName, outputPath)
+			fmt.Printf("config file created at %s\n", outputPath)
+		case "font":
+			cobra.CheckErr(createFont())
+			fmt.Printf("font created at %s\n", path.Join(outputPath, fontFolder))
+		case "bg":
+			cobra.CheckErr(createBG())
+			fmt.Printf("background-image template created at %s\n", path.Join(outputPath, bgFolder))
 		default:
 			fmt.Println("nothing created")
 		}
@@ -64,30 +72,97 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	generalCmd.Flags().StringVarP(&templateType, "template", "t", "config", "config template")
-	generalCmd.Flags().StringVarP(&outputPath, "output", "o", "", "output path")
+	generalCmd.Flags().StringVarP(&templateType, "template", "t", "all", "config template(default is config)")
+	generalCmd.Flags().StringVarP(&outputPath, "output", "o", "", "output path (default is $HOME/.ig/)")
 }
-
-func createConfig() error {
-	if outputPath == "" {
-		home, err := os.UserHomeDir()
-		cobra.CheckErr(err)
-		outputPath = path.Join(home, baseFolder)
-	}
-	err := os.MkdirAll(outputPath, os.ModePerm)
-	fmt.Sprintln(outputPath, err)
+func createBG() error {
+	fillOutputFolder()
+	safeCreateFolder(path.Join(outputPath, bgFolder))
+	bgs, err := tpl.BGFileTemplate.ReadDir(bgFolder)
 	if err != nil {
 		return err
 	}
+	for _, bg := range bgs {
+		fontFile, err := os.Create(path.Join(outputPath, bgFolder, bg.Name()))
+		if err != nil {
+			return err
+		}
+		defer fontFile.Close()
+		fontContent, err := tpl.BGFileTemplate.Open(fmt.Sprintf("%s/%s", bgFolder, bg.Name()))
+		if err != nil {
+			return err
+		}
+		_, err = io.Copy(fontFile, fontContent)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	return nil
+}
+func createFont() error {
+	fillOutputFolder()
+	safeCreateFolder(path.Join(outputPath, fontFolder))
+	fonts, err := tpl.FontFileTemplate.ReadDir(fontFolder)
+	if err != nil {
+		return err
+	}
+	for _, font := range fonts {
+		fontFile, err := os.Create(path.Join(outputPath, fontFolder, font.Name()))
+		if err != nil {
+			return err
+		}
+		defer fontFile.Close()
+		fontContent, err := tpl.FontFileTemplate.Open(fmt.Sprintf("%s/%s", fontFolder, font.Name()))
+		if err != nil {
+			return err
+		}
+		_, err = io.Copy(fontFile, fontContent)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	return nil
+}
+
+func createConfig() error {
+	fillOutputFolder()
+	safeCreateFolder(outputPath)
 	configFile, err := os.Create(path.Join(outputPath, configFileName))
 	if err != nil {
 		return err
 	}
 	defer configFile.Close()
-	configTemplate := template.Must(template.New("config").Parse(string(tpl.ConfigTemplate())))
-	err = configTemplate.Execute(configFile, nil)
+	configContent, err := tpl.ConfigFileTemplate.Open("config.yaml")
+	if err != nil {
+		return err
+	}
+	_, err = io.Copy(configFile, configContent)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+func fillOutputFolder() {
+	if outputPath == "" {
+		home, err := os.UserHomeDir()
+		cobra.CheckErr(err)
+		outputPath = path.Join(home, baseFolder)
+	}
+}
+func safeCreateFolder(filePath string) {
+	if !exists(filePath) {
+		err := os.MkdirAll(filePath, os.ModePerm)
+		cobra.CheckErr(err)
+		fmt.Printf("%s created\n", filePath)
+	}
+}
+
+func exists(path string) bool {
+	_, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return true
 }

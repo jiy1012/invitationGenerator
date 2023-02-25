@@ -32,6 +32,11 @@ import (
 
 var cfgFile string
 
+const configFileName = "config.yaml"
+const baseFolder = ".ig"
+const fontFolder = "fonts"
+const bgFolder = "templates"
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "ig",
