@@ -2,14 +2,14 @@
 # input
 # names.txt contains one name in a line
 Names: "res/names.txt" #名单文件，每行一个
-ImageTemplate: 'res/templates/background.jpg' #图片模板
+ImageTemplate: 'res/templates/background.png' #图片模板
 # output
 OutDir: 'res/output/' #输出目录
 
 # display 
 Font: "res/fonts/STHeiti Medium.ttc" #字体文件路径
 FontSize: 54 #字体大小
-TextAxisX: 100 #x坐标 文字中心点的x坐标（方便自带居中效果）
+TextAxisX: 200 #x坐标 文字中心点的x坐标（方便自带居中效果）
 TextAxisY: 200 #y坐标 文字中心点的y坐标（方便自带居中效果）
 TextColor:
   R: 255 #红

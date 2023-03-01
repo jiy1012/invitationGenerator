@@ -22,12 +22,8 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"fmt"
-	"os"
-	"path"
-
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	"os"
 )
 
 var cfgFile string
@@ -57,46 +53,12 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.ig/config.yaml)")
-
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-}
-
-// initConfig reads in config file and ENV variables if set.
-func initConfig() {
-	if cfgFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
-	} else {
-		// Find home directory.
-		home, err := os.UserHomeDir()
-		cobra.CheckErr(err)
-		configHome := path.Join(home, baseFolder)
-		os.MkdirAll(configHome, os.ModePerm)
-		// Search config in home directory with name ".invitationGenerator" (without extension).
-		viper.AddConfigPath(configHome)
-		viper.SetConfigType("yaml")
-		viper.SetConfigName("config")
-	}
-
-	viper.AutomaticEnv() // read in environment variables that match
-
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Fprintln(os.Stderr, "Using config file: ", viper.ConfigFileUsed())
-		fmt.Fprintln(os.Stderr, "Using names file: ", viper.GetString("Names"))
-		fmt.Fprintln(os.Stderr, "Using image template file: ", viper.GetString("ImageTemplate"))
-		fmt.Fprintln(os.Stderr, "Using font file: ", viper.GetString("Font"), " font size:", viper.GetInt("FontSize"))
-		fmt.Fprintln(os.Stderr, "text coordinate: (", viper.GetInt("TextAxisX"), ",", viper.GetInt("TextAxisY"), ")")
-		fmt.Fprintln(os.Stderr, "text color RGBA: (", viper.GetUint("TextColor.R"), ",", viper.GetUint("TextColor.G"), ",", viper.GetUint("TextColor.B"), ",", viper.GetUint("TextColor.A"), ")")
-		fmt.Fprintln(os.Stderr, "output dir: ", viper.GetString("OutDir"))
-	}
 }

@@ -48,6 +48,7 @@ var batchCmd = &cobra.Command{
 		imagePath := getTemplateImagePath()
 		im := loadTemplateImage(imagePath)
 		outputPath = getOutput()
+		fontName, fontSize, x, y, r, g, b, a := getFont()
 		/*
 			= and > for indicating progress
 			- and . for indicating incomplete progress
@@ -63,7 +64,7 @@ var batchCmd = &cobra.Command{
 		for i := 0; i < count; i++ {
 			bar.Increment()
 			bar.Set("now_process_name", fmt.Sprintf("%s%s", names[i], strings.Repeat(" ", maxLength-len(names[i]))))
-			drawGG(im, names[i], filepath.Ext(imagePath), outputPath)
+			drawGG(im, names[i], filepath.Ext(imagePath), outputPath, fontName, fontSize, x, y, r, g, b, a)
 			//time.Sleep(time.Second * 1)
 		}
 		bar.Set("now_process_name", fmt.Sprintf("%s%s", "complete!", strings.Repeat(" ", maxLength-9)))
@@ -75,6 +76,8 @@ var batchCmd = &cobra.Command{
 }
 
 func init() {
+	cobra.OnInitialize(initConfig)
+
 	rootCmd.AddCommand(batchCmd)
 
 	// Here you will define your flags and configuration settings.
@@ -86,6 +89,39 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// batchCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	batchCmd.Flags().StringVarP(&cfgFile, "config", "c", "", "config file (default is $HOME/.ig/config.yaml)")
+
+}
+
+// initConfig reads in config file and ENV variables if set.
+func initConfig() {
+	if cfgFile != "" {
+		// Use config file from the flag.
+		viper.SetConfigFile(cfgFile)
+	} else {
+		// Find home directory.
+		home, err := os.UserHomeDir()
+		cobra.CheckErr(err)
+		configHome := path.Join(home, baseFolder)
+		os.MkdirAll(configHome, os.ModePerm)
+		// Search config in home directory with name ".invitationGenerator" (without extension).
+		viper.AddConfigPath(configHome)
+		viper.SetConfigType("yaml")
+		viper.SetConfigName("config")
+	}
+
+	viper.AutomaticEnv() // read in environment variables that match
+
+	// If a config file is found, read it in.
+	if err := viper.ReadInConfig(); err == nil {
+		//fmt.Fprintln(os.Stderr, "Using config file: ", viper.ConfigFileUsed())
+		//fmt.Fprintln(os.Stderr, "Using names file: ", viper.GetString("Names"))
+		//fmt.Fprintln(os.Stderr, "Using image template file: ", viper.GetString("ImageTemplate"))
+		//fmt.Fprintln(os.Stderr, "Using font file: ", viper.GetString("Font"), " font size:", viper.GetInt("FontSize"))
+		//fmt.Fprintln(os.Stderr, "text coordinate: (", viper.GetInt("TextAxisX"), ",", viper.GetInt("TextAxisY"), ")")
+		//fmt.Fprintln(os.Stderr, "text color RGBA: (", viper.GetUint("TextColor.R"), ",", viper.GetUint("TextColor.G"), ",", viper.GetUint("TextColor.B"), ",", viper.GetUint("TextColor.A"), ")")
+		//fmt.Fprintln(os.Stderr, "output dir: ", viper.GetString("OutDir"))
+	}
 }
 
 func getNames() ([]string, int) {
@@ -133,9 +169,8 @@ func loadTemplateImage(imgPath string) image.Image {
 	cobra.CheckErr(err)
 	return im
 }
-func drawGG(img image.Image, word string, ext string, output string) {
+func drawGG(img image.Image, word string, ext string, output string, fontName string, fontSize int, x, y int, r, g, b, a uint) {
 	dc := gg.NewContextForImage(img)
-	fontName, fontSize, x, y, r, g, b, a := getFont()
 	err := dc.LoadFontFace(fontName, float64(fontSize))
 	cobra.CheckErr(err)
 	////1920x1200

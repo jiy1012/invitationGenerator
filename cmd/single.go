@@ -23,9 +23,13 @@ package cmd
 
 import (
 	"fmt"
-
 	"github.com/spf13/cobra"
+	"path/filepath"
 )
+
+var imgTemplate, outDir, name, font string
+var textAxisX, textAxisY, fontSize int
+var colorRed, colorGreen, colorBlue, colorAlpha uint
 
 // singleCmd represents the single command
 var singleCmd = &cobra.Command{
@@ -33,7 +37,10 @@ var singleCmd = &cobra.Command{
 	Short: "单次执行",
 	Long:  `命令行单次执行一次，无需生成配置文件`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("single called")
+		safeCreateFolder(outDir)
+		im := loadTemplateImage(imgTemplate)
+		drawGG(im, name, filepath.Ext(imgTemplate), outDir, font, fontSize, textAxisX, textAxisY, colorRed, colorGreen, colorBlue, colorAlpha)
+		fmt.Println("completed。file at ", outDir)
 	},
 }
 
@@ -49,4 +56,20 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// singleCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	singleCmd.Flags().StringVarP(&imgTemplate, "template", "t", "", "image template( required )")
+	singleCmd.Flags().StringVarP(&outDir, "output", "o", "./", "output path (default is ./)")
+	singleCmd.Flags().StringVarP(&name, "name", "n", "", "text of name (required)")
+
+	singleCmd.Flags().StringVarP(&font, "font", "f", "fonts/STHeiti Medium.ttc", "font location (default is )")
+	singleCmd.Flags().IntVarP(&fontSize, "size", "s", 0, "text of name (required)")
+
+	singleCmd.Flags().IntVarP(&textAxisX, "axisX", "x", 0, "x-coordinate of text (required)")
+	singleCmd.Flags().IntVarP(&textAxisY, "axisY", "y", 0, "y-coordinate of text (required)")
+
+	singleCmd.Flags().UintVarP(&colorRed, "red", "r", 0, "color of text:r (required)")
+	singleCmd.Flags().UintVarP(&colorGreen, "green", "g", 0, "color of text:g (required)")
+	singleCmd.Flags().UintVarP(&colorBlue, "blue", "b", 0, "color of text:b (required)")
+	singleCmd.Flags().UintVarP(&colorAlpha, "alpha", "a", 1, "color of text:a (required)")
+
 }
