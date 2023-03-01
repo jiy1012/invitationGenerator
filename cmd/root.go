@@ -91,6 +91,12 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+		fmt.Fprintln(os.Stderr, "Using config file: ", viper.ConfigFileUsed())
+		fmt.Fprintln(os.Stderr, "Using names file: ", viper.GetString("Names"))
+		fmt.Fprintln(os.Stderr, "Using image template file: ", viper.GetString("ImageTemplate"))
+		fmt.Fprintln(os.Stderr, "Using font file: ", viper.GetString("Font"), " font size:", viper.GetInt("FontSize"))
+		fmt.Fprintln(os.Stderr, "text coordinate: (", viper.GetInt("TextAxisX"), ",", viper.GetInt("TextAxisY"), ")")
+		fmt.Fprintln(os.Stderr, "text color RGBA: (", viper.GetUint("TextColor.R"), ",", viper.GetUint("TextColor.G"), ",", viper.GetUint("TextColor.B"), ",", viper.GetUint("TextColor.A"), ")")
+		fmt.Fprintln(os.Stderr, "output dir: ", viper.GetString("OutDir"))
 	}
 }
