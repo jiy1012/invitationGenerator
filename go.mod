@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/cheggaaa/pb/v3 v3.1.0
+	github.com/fogleman/gg v1.3.0
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.15.0
 )
@@ -11,10 +12,8 @@ require (
 require (
 	github.com/VividCortex/ewma v1.1.1 // indirect
 	github.com/fatih/color v1.13.0 // indirect
-	github.com/fogleman/gg v1.3.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
-	github.com/h2non/bimg v1.1.9 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
