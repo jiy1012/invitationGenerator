@@ -1,5 +1,6 @@
 # This is an example .goreleaser.yml file with some sensible defaults.
 # Make sure to check the documentation at https://goreleaser.com
+project_name: ig
 before:
   hooks:
     # You may remove this if you don't use go modules.
@@ -9,6 +10,7 @@ before:
 builds:
   - env:
       - CGO_ENABLED=0
+    binary: ig
     goos:
       - linux
       - windows
@@ -43,3 +45,30 @@ changelog:
 # Feel free to remove those if you don't want/use them.
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 # vim: set ts=2 sw=2 tw=0 fo=cnqoj
+brews:
+  - name: ig
+    tap:
+      owner: jiy1012
+      name: homebrew-brew
+      token: "{{ .Env.GITHUB_TOKEN }}"
+    url_template: "https://github.com/jiy1012/invitationGenerator/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    # Git author used to commit to the repository.
+    # Defaults are shown.
+    commit_author:
+      name: jiy1012
+      email: jiy1012@163.com
+    homepage: "https://github.com/jiy1012/invitationGenerator"
+    description: "invitation images generator."
+
+    # Packages your package depends on.
+    dependencies:
+      - name: git
+
+    # So you can `brew test` your formula.
+    # Default is empty.
+    test: |
+      system "#{bin}/ig --help"
+    # Custom install script for brew.
+    # Default is 'bin.install "program"'.
+    install: |
+      bin.install "ig"
