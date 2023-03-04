@@ -57,6 +57,7 @@ brews:
     commit_author:
       name: jiy1012
       email: jiy1012@163.com
+    folder: Formula
     homepage: "https://github.com/jiy1012/invitationGenerator"
     description: "invitation images generator."
 
