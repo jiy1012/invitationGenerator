@@ -10,5 +10,5 @@ git clone https://github.com/jiy1012/invitationGenerator && go build -o ig main.
 ## 2.brew安装
 ```
 brew tap jiy1012/brew
-brew install ig
+brew install jiy1012/brew/ig
 ```
